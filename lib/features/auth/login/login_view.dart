@@ -53,58 +53,58 @@ class LoginView extends GetView<LoginController> {
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
                    const SizedBox(height: 28),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Obx(
-                        () => GestureDetector(
-                          onTap: () => controller.toggleAccountType(true),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            decoration: BoxDecoration(
-                              color: controller.isCustomer.value ? const Color(0xFFFF58D6) : Colors.white12,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Customer',
-                                style: TextStyle(
-                                  color: controller.isCustomer.value ? Colors.white : Colors.white70,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Obx(
-                        () => GestureDetector(
-                          onTap: () => controller.toggleAccountType(false),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            decoration: BoxDecoration(
-                              color: controller.isCustomer.value ? Colors.white12 : const Color(0xFF8D32F0),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Creator',
-                                style: TextStyle(
-                                  color: controller.isCustomer.value ? Colors.white70 : Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 28),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: Obx(
+                //         () => GestureDetector(
+                //           onTap: () => controller.toggleAccountType(true),
+                //           child: Container(
+                //             padding: const EdgeInsets.symmetric(vertical: 14),
+                //             decoration: BoxDecoration(
+                //               color: controller.isCustomer.value ? const Color(0xFFFF58D6) : Colors.white12,
+                //               borderRadius: BorderRadius.circular(18),
+                //             ),
+                //             child: Center(
+                //               child: Text(
+                //                 'Customer',
+                //                 style: TextStyle(
+                //                   color: controller.isCustomer.value ? Colors.white : Colors.white70,
+                //                   fontWeight: FontWeight.bold,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 16),
+                //     Expanded(
+                //       child: Obx(
+                //         () => GestureDetector(
+                //           onTap: () => controller.toggleAccountType(false),
+                //           child: Container(
+                //             padding: const EdgeInsets.symmetric(vertical: 14),
+                //             decoration: BoxDecoration(
+                //               color: controller.isCustomer.value ? Colors.white12 : const Color(0xFF8D32F0),
+                //               borderRadius: BorderRadius.circular(18),
+                //             ),
+                //             child: Center(
+                //               child: Text(
+                //                 'Creator',
+                //                 style: TextStyle(
+                //                   color: controller.isCustomer.value ? Colors.white70 : Colors.white,
+                //                   fontWeight: FontWeight.bold,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(height: 28),
                 
                 Container(
                   padding: const EdgeInsets.all(24),

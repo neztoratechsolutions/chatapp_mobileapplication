@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'favorites_controller.dart';
-import '../creators/creator_details_view.dart';
+import '../../creator_dashboard/creators/creator_details_view.dart';
 import '../wallet/wallet_controller.dart';
 
 class FavoritesView extends GetView<FavoritesController> {

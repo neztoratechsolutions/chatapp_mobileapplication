@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../creators/creator_details_view.dart';
+import '../../creator_dashboard/creators/creator_details_view.dart';
 import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'bottom_nav_controller.dart';
 import '../home/home_controller.dart';
-import '../creators/creators_controller.dart';
+import '../../creator_dashboard/creators/creators_controller.dart';
 import '../chat/chat_controller.dart';
 import '../game/game_controller.dart';
 import '../profile/profile_controller.dart';
