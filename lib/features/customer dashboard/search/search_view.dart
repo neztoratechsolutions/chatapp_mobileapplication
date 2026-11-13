@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:get/get.dart';
 import 'search_controller.dart';
-import '../creators/creator_details_view.dart';
+import '../../creator_dashboard/creators/creator_details_view.dart';
 
 class SearchView extends GetView<SearchController> {
   const SearchView({super.key});

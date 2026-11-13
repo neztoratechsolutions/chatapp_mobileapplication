@@ -52,60 +52,7 @@ class LoginView extends GetView<LoginController> {
                   'Sign in to continue to VeloraLive',
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
-                   const SizedBox(height: 28),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Obx(
-                //         () => GestureDetector(
-                //           onTap: () => controller.toggleAccountType(true),
-                //           child: Container(
-                //             padding: const EdgeInsets.symmetric(vertical: 14),
-                //             decoration: BoxDecoration(
-                //               color: controller.isCustomer.value ? const Color(0xFFFF58D6) : Colors.white12,
-                //               borderRadius: BorderRadius.circular(18),
-                //             ),
-                //             child: Center(
-                //               child: Text(
-                //                 'Customer',
-                //                 style: TextStyle(
-                //                   color: controller.isCustomer.value ? Colors.white : Colors.white70,
-                //                   fontWeight: FontWeight.bold,
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //     const SizedBox(width: 16),
-                //     Expanded(
-                //       child: Obx(
-                //         () => GestureDetector(
-                //           onTap: () => controller.toggleAccountType(false),
-                //           child: Container(
-                //             padding: const EdgeInsets.symmetric(vertical: 14),
-                //             decoration: BoxDecoration(
-                //               color: controller.isCustomer.value ? Colors.white12 : const Color(0xFF8D32F0),
-                //               borderRadius: BorderRadius.circular(18),
-                //             ),
-                //             child: Center(
-                //               child: Text(
-                //                 'Creator',
-                //                 style: TextStyle(
-                //                   color: controller.isCustomer.value ? Colors.white70 : Colors.white,
-                //                   fontWeight: FontWeight.bold,
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 28),
-                
+                const SizedBox(height: 32),
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -145,20 +92,40 @@ class LoginView extends GetView<LoginController> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: controller.goToForgotPassword,
-                          child: const Text('Forgot password?', style: TextStyle(color: Colors.white70)),
+                          child: const Text('Forgot password?',
+                              style: TextStyle(color: Colors.white70)),
                         ),
                       ),
                       const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: controller.login,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            backgroundColor: const Color(0xFFEF3AAB),
+                        child: Obx(
+                          () => ElevatedButton(
+                            onPressed: controller.isLoading.value ? null : controller.login,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              backgroundColor: const Color(0xFFEF3AAB),
+                            ),
+                            child: controller.isLoading.value
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Continue',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
-                          child: const Text('Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],
@@ -168,15 +135,43 @@ class LoginView extends GetView<LoginController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Don’t have an account?', style: TextStyle(color: Colors.white70)),
+                    const Text('Don’t have an account?',
+                        style: TextStyle(color: Colors.white70)),
                     TextButton(
                       onPressed: controller.goToRegister,
-                      child: const Text('Sign up', style: TextStyle(color: Color(0xFFEF3AAB), fontWeight: FontWeight.bold)),
+                      child: const Text('Sign up',
+                          style: TextStyle(
+                              color: Color(0xFFEF3AAB),
+                              fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
               ],
             ),
+          ),
+          Obx(
+            () => controller.isLoading.value
+                ? Container(
+                    color: Colors.black.withOpacity(0.6),
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: Color(0xFFFF58D6)),
+                          SizedBox(height: 16),
+                          Text(
+                            'Signing in...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),

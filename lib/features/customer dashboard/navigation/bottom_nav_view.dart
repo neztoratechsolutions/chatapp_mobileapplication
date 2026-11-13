@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'bottom_nav_controller.dart';
 import '../home/home_view.dart';
-import '../creators/creators_view.dart';
+import '../../creator_dashboard/creators/creators_view.dart';
 import '../chat/chat_view.dart';
 import '../game/game_view.dart';
 import '../profile/profile_view.dart';

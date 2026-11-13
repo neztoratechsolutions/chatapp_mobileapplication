@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../favorites/favorites_controller.dart';
+import '../../customer dashboard/favorites/favorites_controller.dart';
 
 class CreatorDetailsView extends StatelessWidget {
   final Map<String, String> creator;
