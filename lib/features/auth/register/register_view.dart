@@ -153,33 +153,94 @@ class RegisterView extends GetView<RegisterController> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        initialValue: controller.selectedState.value,
-                        dropdownColor: const Color(0xFF141229),
-                        decoration: _inputDecoration('State'),
-                        style: const TextStyle(color: Colors.white),
-                        items: const [
-                          DropdownMenuItem(value: 'Maharashtra', child: Text('Maharashtra')),
-                          DropdownMenuItem(value: 'Karnataka', child: Text('Karnataka')),
-                          DropdownMenuItem(value: 'Delhi', child: Text('Delhi')),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.selectedState.value = value;
-                          }
-                        },
+                      Obx(
+                        () => DropdownButtonFormField<String>(
+                          value: controller.selectedGender.value,
+                          dropdownColor: const Color(0xFF141229),
+                          decoration: _inputDecoration('Gender'),
+                          style: const TextStyle(color: Colors.white),
+                          icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
+                          hint: const Text('Select Gender', style: TextStyle(color: Colors.white70)),
+                          items: controller.genderOptions.map((gender) {
+                            return DropdownMenuItem<String>(
+                              value: gender,
+                              child: Text(gender),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              controller.selectedGender.value = value;
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Obx(
+                        () => DropdownButtonFormField<int>(
+                          value: controller.selectedStateId.value,
+                          dropdownColor: const Color(0xFF141229),
+                          decoration: _inputDecoration('State'),
+                          style: const TextStyle(color: Colors.white),
+                          icon: controller.isStatesLoading.value
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white70,
+                                  ),
+                                )
+                              : const Icon(Icons.arrow_drop_down, color: Colors.white70),
+                          hint: Text(
+                            controller.isStatesLoading.value
+                                ? 'Loading states...'
+                                : 'Select State',
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                          items: controller.statesList.map((state) {
+                            return DropdownMenuItem<int>(
+                              value: state.id,
+                              child: Text(state.name),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              controller.selectedStateId.value = value;
+                            }
+                          },
+                        ),
                       ),
                       const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: controller.register,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            backgroundColor: const Color(0xFFFF58D6),
+                        child: Obx(
+                          () => ElevatedButton(
+                            onPressed: controller.isRegistering.value ? null : controller.register,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              backgroundColor: controller.isCustomer.value
+                                  ? const Color(0xFFFF58D6)
+                                  : const Color(0xFF8D32F0),
+                            ),
+                            child: controller.isRegistering.value
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Register as ${controller.isCustomer.value ? 'Customer' : 'Creator'}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
-                          child: const Text('Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -200,6 +261,30 @@ class RegisterView extends GetView<RegisterController> {
                 ),
               ],
             ),
+          ),
+          Obx(
+            () => controller.isRegistering.value
+                ? Container(
+                    color: Colors.black.withOpacity(0.6),
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: Color(0xFFFF58D6)),
+                          SizedBox(height: 16),
+                          Text(
+                            'Registering account...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
