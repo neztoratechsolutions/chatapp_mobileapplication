@@ -49,7 +49,7 @@ class ForgetPasswordView extends GetView<ForgetPasswordController> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Enter your email to receive a reset link',
+                  'Enter your email to receive a reset code',
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
                 const SizedBox(height: 36),
@@ -71,26 +71,73 @@ class ForgetPasswordView extends GetView<ForgetPasswordController> {
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: controller.sendResetLink,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            backgroundColor: const Color(0xFFEF3AAB),
+                        child: Obx(
+                          () => ElevatedButton(
+                            onPressed: controller.isLoading.value
+                                ? null
+                                : controller.sendResetLink,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              backgroundColor: const Color(0xFFEF3AAB),
+                            ),
+                            child: controller.isLoading.value
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Send reset code',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
-                          child: const Text('Send reset link', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
                         onPressed: controller.goToLogin,
-                        child: const Text('Back to login', style: TextStyle(color: Colors.white70)),
+                        child: const Text('Back to login',
+                            style: TextStyle(color: Colors.white70)),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
+          ),
+          Obx(
+            () => controller.isLoading.value
+                ? Container(
+                    color: Colors.black.withOpacity(0.6),
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: Color(0xFFFF58D6)),
+                          SizedBox(height: 16),
+                          Text(
+                            'Sending reset code...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),

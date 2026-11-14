@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/auth/forget_password/forget_password_binding.dart';
 import 'features/auth/forget_password/forget_password_view.dart';
+import 'features/auth/otp/otp_binding.dart';
+import 'features/auth/otp/otp_view.dart';
+import 'features/auth/reset_password/reset_password_binding.dart';
+import 'features/auth/reset_password/reset_password_view.dart';
 import 'features/auth/login/login_binding.dart';
 import 'features/auth/login/login_view.dart';
 import 'features/auth/register/register_binding.dart';
@@ -75,6 +79,16 @@ class MyApp extends StatelessWidget {
           name: '/forgot-password',
           page: () => const ForgetPasswordView(),
           binding: ForgetPasswordBinding(),
+        ),
+        GetPage(
+          name: '/otp',
+          page: () => const OtpView(),
+          binding: OtpBinding(),
+        ),
+        GetPage(
+          name: '/reset-password',
+          page: () => const ResetPasswordView(),
+          binding: ResetPasswordBinding(),
         ),
         GetPage(
           name: '/home',
