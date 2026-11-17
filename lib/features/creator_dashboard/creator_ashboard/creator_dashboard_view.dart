@@ -18,231 +18,191 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-              // 1. Header (Logo, App Name, Logout)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFFF58D6), Color(0xFF8D32F0)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      RichText(
-                        text: const TextSpan(
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Roboto',
-                          ),
-                          children: [
-                            TextSpan(text: 'Velora', style: TextStyle(color: Colors.white)),
-                            TextSpan(text: 'Creator', style: TextStyle(color: Color(0xFFFF58D6))),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white70),
-                    onPressed: () {
-                      Get.defaultDialog(
-                        title: 'Logout',
-                        titleStyle: const TextStyle(color: Colors.white),
-                        middleText: 'Are you sure you want to logout?',
-                        middleTextStyle: const TextStyle(color: Colors.white70),
-                        backgroundColor: const Color(0xFF17132F),
-                        textConfirm: 'Yes',
-                        textCancel: 'No',
-                        confirmTextColor: Colors.white,
-                        cancelTextColor: Colors.white70,
-                        buttonColor: const Color(0xFFFF58D6),
-                        onConfirm: () {
-                          Get.back();
-                          controller.logout();
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // 2. Online status switch
-              Obx(
-                () => GestureDetector(
-                  onTap: controller.toggleOnlineStatus,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: controller.isOnline.value
-                          ? const Color(0xFF0F3223)
-                          : const Color(0xFF221F35),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: controller.isOnline.value
-                            ? const Color(0x3300C853)
-                            : Colors.white12,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Row(
+                    // 1. Header (Logo, App Name, Logout)
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            Icon(
-                              Icons.power_settings_new_rounded,
-                              color: controller.isOnline.value
-                                  ? const Color(0xFF00C853)
-                                  : Colors.white54,
-                              size: 22,
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFFFF58D6), Color(0xFF8D32F0)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              controller.isOnline.value ? 'Online' : 'Offline',
-                              style: TextStyle(
-                                color: controller.isOnline.value
-                                    ? const Color(0xFF00C853)
-                                    : Colors.white54,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                            RichText(
+                              text: const TextSpan(
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Roboto',
+                                ),
+                                children: [
+                                  TextSpan(text: 'Velora', style: TextStyle(color: Colors.white)),
+                                  TextSpan(text: 'Creator', style: TextStyle(color: Color(0xFFFF58D6))),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: controller.isOnline.value
-                                ? const Color(0xFF00C853)
-                                : Colors.white24,
-                            boxShadow: controller.isOnline.value
-                                ? [
-                                    BoxShadow(
-                                      color: const Color(0xFF00C853).withOpacity(0.5),
-                                      blurRadius: 6,
-                                      spreadRadius: 2,
-                                    )
-                                  ]
-                                : null,
-                          ),
+                        IconButton(
+                          icon: const Icon(Icons.logout_rounded, color: Colors.white70),
+                          onPressed: controller.confirmLogout,
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
-              // 3. Navigation Bar for dashboard sections
-              Obx(
-                () => SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildTabItem('Inbox', Icons.chat_bubble_outline_rounded,routeName: '/inbox'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Reviews', Icons.star_outline_rounded,routeName: '/reviews'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Settings', Icons.settings_outlined,routeName: '/settings'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Profile Setup', Icons.person_outline_rounded,
-                          routeName: '/profile-setup'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('KYC', Icons.verified_user_outlined,
-                          routeName: '/kyc-verify'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('My Gallery', Icons.image_outlined,
-                          routeName: '/creator-gallery'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Pricing', Icons.account_balance_wallet_outlined,
-                          routeName: '/creator-pricing'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Earnings', Icons.bar_chart_rounded,
-                          routeName: '/creator-earnings'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Gifts', Icons.card_giftcard_rounded,
-                          routeName: '/gifts-received'),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Logout', Icons.logout_rounded),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 28),
+                    // 2. Online status switch (connected to API http://62.72.31.253:8002/user-status/)
+                    Obx(
+                      () => GestureDetector(
+                        onTap: controller.isUpdatingStatus.value
+                            ? null
+                            : controller.toggleOnlineStatus,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: controller.isOnline.value
+                                ? const Color(0xFF0F3223)
+                                : const Color(0xFF221F35),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: controller.isOnline.value
+                                  ? const Color(0x3300C853)
+                                  : Colors.white12,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  if (controller.isUpdatingStatus.value)
+                                    const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Color(0xFFFF58D6),
+                                      ),
+                                    )
+                                  else
+                                    Icon(
+                                      Icons.power_settings_new_rounded,
+                                      color: controller.isOnline.value
+                                          ? const Color(0xFF00C853)
+                                          : Colors.white54,
+                                      size: 22,
+                                    ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    controller.isOnline.value ? 'Online' : 'Offline',
+                                    style: TextStyle(
+                                      color: controller.isOnline.value
+                                          ? const Color(0xFF00C853)
+                                          : Colors.white54,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    controller.isOnline.value ? 'Available' : 'Unavailable',
+                                    style: TextStyle(
+                                      color: controller.isOnline.value
+                                          ? const Color(0xFF00C853).withOpacity(0.8)
+                                          : Colors.white38,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: controller.isOnline.value
+                                          ? const Color(0xFF00C853)
+                                          : Colors.white24,
+                                      boxShadow: controller.isOnline.value
+                                          ? [
+                                              BoxShadow(
+                                                color: const Color(0xFF00C853).withOpacity(0.6),
+                                                blurRadius: 8,
+                                                spreadRadius: 2,
+                                              )
+                                            ]
+                                          : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
 
-              // 4. Main Body Content Switcher
-              Obx(() {
-                switch (controller.selectedTab.value) {
-                  case 'Inbox':
-                    return _buildInboxContent();
-                  case 'Reviews':
-                    return _buildReviewsContent();
-                  case 'Profile Setup':
-                    return _buildRoutePreviewContent(
-                      title: 'Profile Setup',
-                      subtitle: 'Open your profile setup page',
-                      icon: Icons.person_outline_rounded,
-                      routeName: '/profile-setup',
-                    );
-                  case 'Settings':
-                    return _buildSettingsContent();
-                  case 'KYC':
-                    return _buildRoutePreviewContent(
-                      title: 'KYC Verification',
-                      subtitle: 'Open your verification page',
-                      icon: Icons.verified_user_outlined,
-                      routeName: '/kyc-verify',
-                    );
-                  case 'My Gallery':
-                    return _buildRoutePreviewContent(
-                      title: 'My Gallery',
-                      subtitle: 'Open your gallery page',
-                      icon: Icons.image_outlined,
-                      routeName: '/creator-gallery',
-                    );
-                  case 'Pricing':
-                    return _buildRoutePreviewContent(
-                      title: 'Configure Pricing',
-                      subtitle: 'Open your pricing page',
-                      icon: Icons.account_balance_wallet_outlined,
-                      routeName: '/creator-pricing',
-                    );
-                  case 'Earnings':
-                    return _buildRoutePreviewContent(
-                      title: 'Earning Analytics',
-                      subtitle: 'Open your earnings page',
-                      icon: Icons.bar_chart_rounded,
-                      routeName: '/creator-earnings',
-                    );
-                  case 'Gifts':
-                    return _buildRoutePreviewContent(
-                      title: 'Gifts Received',
-                      subtitle: 'Open your gifts page',
-                      icon: Icons.card_giftcard_rounded,
-                      routeName: '/gifts-received',
-                    );
-                  case 'Logout':
-                    return _buildLogoutContent();
-                  default:
-                    return _buildReviewsContent();
-                }
-              }),
-                    ],
+                    // 3. Horizontal Tab Navigation Bar
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Obx(
+                        () => Row(
+                          children: [
+                            _buildTabItem('Dashboard', Icons.grid_view_rounded),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Inbox', Icons.chat_bubble_outline_rounded),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Reviews', Icons.star_outline_rounded),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Earnings', Icons.bar_chart_rounded),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Pricing', Icons.account_balance_wallet_outlined),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Gallery', Icons.image_outlined),
+                            const SizedBox(width: 10),
+                            _buildTabItem('KYC', Icons.verified_user_outlined),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Profile Setup', Icons.person_outline_rounded),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Gifts', Icons.card_giftcard_rounded),
+                            const SizedBox(width: 10),
+                            _buildTabItem('Logout', Icons.logout_rounded),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+
+                    // 4. Main Body Content Switcher
+                    Obx(() {
+                      switch (controller.selectedTab.value) {
+                        case 'Dashboard':
+                          return _buildDashboardContent();
+                        case 'Inbox':
+                          return _buildInboxContent();
+                        case 'Reviews':
+                          return _buildReviewsContent();
+                        default:
+                          return _buildDashboardContent();
+                      }
+                    }),
+                  ],
                 ),
               ),
             ),
@@ -252,18 +212,13 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
     );
   }
 
-  Widget _buildTabItem(String tabName, IconData icon, {String? routeName}) {
+  Widget _buildTabItem(String tabName, IconData icon) {
     final isSelected = controller.selectedTab.value == tabName;
     return GestureDetector(
-      onTap: () {
-        controller.changeTab(tabName);
-        if (routeName != null) {
-          controller.navigateToTool(routeName);
-        }
-      },
+      onTap: () => controller.changeTab(tabName),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: isSelected
@@ -273,11 +228,14 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
                   end: Alignment.bottomRight,
                 )
               : null,
-          color: isSelected ? null : Colors.transparent,
+          color: isSelected ? null : const Color(0xFF17132F),
+          border: Border.all(
+            color: isSelected ? Colors.transparent : Colors.white10,
+          ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFFFF58D6).withOpacity(0.3),
+                    color: const Color(0xFFFF58D6).withOpacity(0.35),
                     blurRadius: 10,
                     spreadRadius: 1,
                     offset: const Offset(0, 4),
@@ -291,15 +249,15 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
             Icon(
               icon,
               color: isSelected ? Colors.white : Colors.white60,
-              size: 20,
+              size: 18,
             ),
             const SizedBox(width: 8),
             Text(
               tabName,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white60,
+                color: isSelected ? Colors.white : Colors.white70,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                fontSize: 15,
+                fontSize: 14,
               ),
             ),
           ],
@@ -308,185 +266,283 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
     );
   }
 
-  Widget _buildRoutePreviewContent({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required String routeName,
-  }) {
+  // Dashboard Tab Content (Overview, Stats, KYC Banner, Tools)
+  Widget _buildDashboardContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          subtitle,
-          style: const TextStyle(color: Colors.white60, fontSize: 15),
-        ),
-        const SizedBox(height: 24),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF17132F),
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF221F35),
-                  borderRadius: BorderRadius.circular(16),
+        // Welcome Header
+        Obx(
+          () => RichText(
+            text: TextSpan(
+              style: const TextStyle(fontSize: 28, fontFamily: 'Roboto'),
+              children: [
+                const TextSpan(
+                  text: 'Hi, ',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
                 ),
-                child: Icon(icon, color: const Color(0xFFFF58D6), size: 24),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Tap the button below to open this page.',
-                style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () => controller.navigateToTool(routeName),
-                icon: const Icon(Icons.open_in_new_rounded),
-                label: const Text('Open Page'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF58D6),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                TextSpan(
+                  text: '${controller.creatorName.value} ',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLogoutContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Logout',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Sign out from your creator dashboard',
-          style: TextStyle(color: Colors.white60, fontSize: 15),
-        ),
-        const SizedBox(height: 24),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF17132F),
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Are you sure you want to log out?',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'You can sign in again anytime from the login screen.',
-                style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Get.defaultDialog(
-                    title: 'Logout',
-                    titleStyle: const TextStyle(color: Colors.white),
-                    middleText: 'Are you sure you want to logout?',
-                    middleTextStyle: const TextStyle(color: Colors.white70),
-                    backgroundColor: const Color(0xFF17132F),
-                    textConfirm: 'Yes',
-                    textCancel: 'No',
-                    confirmTextColor: Colors.white,
-                    cancelTextColor: Colors.white70,
-                    buttonColor: const Color(0xFFFF58D6),
-                    onConfirm: () {
-                      Get.back();
-                      controller.logout();
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF58D6),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                const TextSpan(
+                  text: '👋',
+                  style: TextStyle(fontSize: 26),
                 ),
-                child: const Text('Logout'),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Reviews Tab Content (matching mockup)
-  Widget _buildReviewsContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Reviews',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Roboto',
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 6),
         const Text(
-          'What customers say',
-          style: TextStyle(
-            color: Colors.white60,
-            fontSize: 16,
+          "Here's how you're doing today",
+          style: TextStyle(color: Colors.white60, fontSize: 15),
+        ),
+        const SizedBox(height: 20),
+
+        // Complete KYC warning block
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF17132F),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: const Color(0x33FFB300), width: 1.2),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Color(0xFFFFB300),
+                size: 26,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Complete your KYC',
+                      style: TextStyle(
+                        color: Color(0xFFFFB300),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "You can't receive payouts until verified.",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => controller.navigateToTool('/kyc-verify'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFB300),
+                  foregroundColor: const Color(0xFF0F0B21),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  minimumSize: Size.zero,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Verify', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
+
+        // 2x2 Stats Grid
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                label: "Today's earnings",
+                value: controller.todayEarnings.value,
+                icon: Icons.trending_up_rounded,
+                iconColor: const Color(0xFF00C853),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildStatCard(
+                label: 'Followers',
+                value: controller.followersCount.value,
+                icon: Icons.people_outline_rounded,
+                iconColor: const Color(0xFFFF58D6),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                label: 'Calls',
+                value: controller.callsCount.value,
+                icon: Icons.phone_outlined,
+                iconColor: const Color(0xFF8D32F0),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildStatCard(
+                label: 'Rating',
+                value: controller.ratingValue.value,
+                icon: Icons.star_outline_rounded,
+                iconColor: const Color(0xFFFFD600),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+
+        // Weekly Earnings Row Card
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF17132F),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Weekly earnings',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFD600),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Obx(
+                  () => Text(
+                    controller.weeklyEarnings.value,
+                    style: const TextStyle(
+                      color: Color(0xFF0F0B21),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 28),
+
+        // Creator Tools Section
+        const Text(
+          'Creator Tools',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 14),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.45,
+          children: [
+            _buildToolTile(
+              title: 'Earnings',
+              subtitle: 'View analytics',
+              icon: Icons.bar_chart_rounded,
+              color: const Color(0xFF00C853),
+              routeName: '/creator-earnings',
+            ),
+            _buildToolTile(
+              title: 'Pricing',
+              subtitle: 'Set call rates',
+              icon: Icons.account_balance_wallet_outlined,
+              color: const Color(0xFFFFD600),
+              routeName: '/creator-pricing',
+            ),
+            _buildToolTile(
+              title: 'Gallery',
+              subtitle: 'Photos & videos',
+              icon: Icons.image_outlined,
+              color: const Color(0xFFFF58D6),
+              routeName: '/creator-gallery',
+            ),
+            _buildToolTile(
+              title: 'Gifts',
+              subtitle: 'Gifts received',
+              icon: Icons.card_giftcard_rounded,
+              color: const Color(0xFF8D32F0),
+              routeName: '/gifts-received',
+            ),
+            _buildToolTile(
+              title: 'Profile Setup',
+              subtitle: 'Edit details',
+              icon: Icons.person_outline_rounded,
+              color: const Color(0xFF00B0FF),
+              routeName: '/profile-setup',
+            ),
+            _buildToolTile(
+              title: 'KYC Verify',
+              subtitle: 'Identity status',
+              icon: Icons.verified_user_outlined,
+              color: const Color(0xFFFF9100),
+              routeName: '/kyc-verify',
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+
+        // Quick Reviews Section
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recent Reviews',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextButton(
+              onPressed: () => controller.changeTab('Reviews'),
+              child: const Text('View All', style: TextStyle(color: Color(0xFFFF58D6))),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
         Obx(
           () => ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.reviews.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            itemCount: controller.reviews.take(2).length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final review = controller.reviews[index];
               return Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF17132F).withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  color: const Color(0xFF17132F).withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white10),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -496,41 +552,28 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
                       children: [
                         Text(
                           review['name'],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         Text(
                           review['time'],
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
-                            fontSize: 13,
-                          ),
+                          style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Row(
-                      children: List.generate(5, (starIndex) {
+                      children: List.generate(5, (sIndex) {
                         return Icon(
                           Icons.star_rounded,
-                          color: starIndex < review['rating']
-                              ? const Color(0xFFFFB300)
-                              : Colors.white10,
-                          size: 20,
+                          color: sIndex < review['rating'] ? const Color(0xFFFFB300) : Colors.white10,
+                          size: 16,
                         );
                       }),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Text(
                       review['comment'],
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 15,
-                        height: 1.4,
-                      ),
+                      style: const TextStyle(color: Colors.white70, fontSize: 14),
                     ),
                   ],
                 ),
@@ -538,11 +581,56 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
             },
           ),
         ),
+        const SizedBox(height: 28),
       ],
     );
   }
 
-  // Inbox Tab Content
+  Widget _buildToolTile({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required String routeName,
+  }) {
+    return GestureDetector(
+      onTap: () => controller.navigateToTool(routeName),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF17132F),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(color: Colors.white54, fontSize: 11),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Inbox Tab Content (Customer Conversations)
   Widget _buildInboxContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,7 +671,7 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF120F26).withOpacity(0.4),
+                    color: const Color(0xFF120F26).withOpacity(0.6),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: Colors.white.withOpacity(0.08)),
                   ),
@@ -682,177 +770,94 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
     );
   }
 
-  // Settings / Creator tools Content
-  Widget _buildSettingsContent() {
+  // Reviews Tab Content
+  Widget _buildReviewsContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Welcome Header
-        Obx(
-          () => RichText(
-            text: TextSpan(
-              style: const TextStyle(fontSize: 28, fontFamily: 'Roboto'),
-              children: [
-                const TextSpan(
-                  text: 'Hi, ',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
-                ),
-                TextSpan(
-                  text: '${controller.creatorName.value} ',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                const TextSpan(
-                  text: '👋',
-                  style: TextStyle(fontSize: 26),
-                ),
-              ],
-            ),
+        const Text(
+          'Reviews',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Roboto',
           ),
         ),
         const SizedBox(height: 6),
         const Text(
-          "Here's how you're doing today",
-          style: TextStyle(color: Colors.white60, fontSize: 15),
-        ),
-        const SizedBox(height: 20),
-
-        // Complete KYC warning block
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: const Color(0xFF17132F),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: const Color(0x33FFB300), width: 1.2),
+          'What customers say',
+          style: TextStyle(
+            color: Colors.white60,
+            fontSize: 16,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 2),
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Color(0xFFFFB300),
-                  size: 22,
+        ),
+        const SizedBox(height: 24),
+        Obx(
+          () => ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.reviews.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final review = controller.reviews[index];
+              return Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF17132F).withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: Colors.white.withOpacity(0.08)),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Complete your KYC',
-                      style: TextStyle(
-                        color: Color(0xFFFFB300),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          review['name'],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          review['time'],
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: List.generate(5, (starIndex) {
+                        return Icon(
+                          Icons.star_rounded,
+                          color: starIndex < review['rating']
+                              ? const Color(0xFFFFB300)
+                              : Colors.white10,
+                          size: 20,
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 12),
                     Text(
-                      "You can't receive payouts until verified.",
-                      style: TextStyle(
+                      review['comment'],
+                      style: const TextStyle(
                         color: Colors.white70,
-                        fontSize: 13,
-                        height: 1.3,
+                        fontSize: 15,
+                        height: 1.4,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
-        const SizedBox(height: 20),
-
-        // 2x2 Stats Grid
-        Row(
-          children: [
-            Expanded(
-              child: _buildStatCard(
-                label: "Today's earnings",
-                value: controller.todayEarnings.value,
-                icon: Icons.trending_up_rounded,
-                iconColor: const Color(0xFF00C853),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildStatCard(
-                label: 'Followers',
-                value: controller.followersCount.value,
-                icon: Icons.people_outline_rounded,
-                iconColor: const Color(0xFFFF58D6),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildStatCard(
-                label: 'Calls',
-                value: controller.callsCount.value,
-                icon: Icons.phone_outlined,
-                iconColor: const Color(0xFF8D32F0),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildStatCard(
-                label: 'Rating',
-                value: controller.ratingValue.value,
-                icon: Icons.star_outline_rounded,
-                iconColor: const Color(0xFFFFD600),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-
-        // Weekly Earnings Row Card
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-          decoration: BoxDecoration(
-            color: const Color(0xFF17132F),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white10),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Weekly earnings',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD600),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Obx(
-                  () => Text(
-                    controller.weeklyEarnings.value,
-                    style: const TextStyle(
-                      color: Color(0xFF0F0B21),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 28),
       ],
     );
   }
@@ -892,40 +897,4 @@ class CreatorDashboardView extends GetView<CreatorDashboardController> {
       ),
     );
   }
-
-  Widget _buildToolItem({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required String routeName,
-  }) {
-    return ListTile(
-      onTap: () => controller.navigateToTool(routeName),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      tileColor: const Color(0xFF17132F),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF221F35),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Icon(icon, color: const Color(0xFFFF58D6), size: 22),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4.0),
-        child: Text(
-          subtitle,
-          style: const TextStyle(color: Colors.white60, fontSize: 12),
-        ),
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white30, size: 16),
-    );
-  }
-
-
 }

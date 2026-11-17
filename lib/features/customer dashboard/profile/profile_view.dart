@@ -130,6 +130,8 @@ class ProfileView extends GetView<ProfileController> {
                             onTap: () {
                               if (isLogout) {
                                 controller.confirmLogout();
+                              } else if (item['title'] == 'Edit Profile') {
+                                Get.toNamed('/profile-setup');
                               } else if (item['title'] == 'Wallet') {
                                 Get.toNamed('/wallet');
                               } else if (item['title'] == 'Settings') {

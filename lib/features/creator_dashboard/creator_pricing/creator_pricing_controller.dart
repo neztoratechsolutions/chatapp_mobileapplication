@@ -22,7 +22,7 @@ class CreatorPricingController extends GetxController {
 
   void changeTab(String tabName) {
     if (tabName == 'Dashboard') {
-      Get.back();
+      Get.offNamed('/creator-dashboard');
     } else if (tabName == 'Profile Setup') {
       Get.offNamed('/profile-setup');
     } else if (tabName == 'KYC') {

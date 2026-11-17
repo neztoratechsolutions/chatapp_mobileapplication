@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/api_endpoints.dart';
+import '../../../core/services/session_service.dart';
 
 class InboxController extends GetxController {
   // Selected tab: 'Dashboard', 'Profile Setup', 'KYC', 'Gallery', 'Pricing', 'Earnings', 'Gifts', 'Inbox'
@@ -6,6 +9,10 @@ class InboxController extends GetxController {
 
   // Status: Online / Offline
   final isOnline = true.obs;
+  final isUpdatingStatus = false.obs;
+  final userId = 21.obs;
+
+  final GetConnect _connect = GetConnect();
 
   // Mock conversation list matching the screenshot
   final conversations = <Map<String, dynamic>>[
@@ -59,13 +66,81 @@ class InboxController extends GetxController {
     },
   ].obs;
 
-  void toggleOnlineStatus() {
-    isOnline.value = !isOnline.value;
+  @override
+  void onInit() {
+    super.onInit();
+    _connect.timeout = const Duration(seconds: 15);
+    _loadSession();
+  }
+
+  Future<void> _loadSession() async {
+    final id = await SessionService.getUserId();
+    if (id > 0) userId.value = id;
+  }
+
+  Future<void> toggleOnlineStatus() async {
+    if (isUpdatingStatus.value) return;
+    isUpdatingStatus.value = true;
+
+    final targetStatus = !isOnline.value;
+
+    try {
+      if (userId.value <= 0) {
+        userId.value = await SessionService.getUserId();
+      }
+      if (userId.value <= 0) {
+        userId.value = 21;
+      }
+
+      final body = {
+        'user_id': userId.value,
+        'is_online': targetStatus,
+      };
+
+      final token = await SessionService.getToken();
+      final headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+      };
+
+      Response response = await _connect.post(
+        ApiEndpoints.userStatusUrl,
+        body,
+        headers: headers,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body != null && response.body is Map) {
+          final resMap = response.body as Map;
+          if (resMap['is_online'] != null) {
+            isOnline.value = resMap['is_online'] == true;
+          } else {
+            isOnline.value = targetStatus;
+          }
+        } else {
+          isOnline.value = targetStatus;
+        }
+
+        Get.snackbar(
+          'Status Updated',
+          isOnline.value ? 'You are now Online' : 'You are now Offline',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: isOnline.value ? const Color(0xFF0F3223) : const Color(0xFF221F35),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } catch (_) {
+      isOnline.value = targetStatus;
+    } finally {
+      isUpdatingStatus.value = false;
+    }
   }
 
   void changeTab(String tabName) {
     if (tabName == 'Dashboard') {
-      Get.back();
+      Get.offNamed('/creator-dashboard');
     } else if (tabName == 'Profile Setup') {
       Get.offNamed('/profile-setup');
     } else if (tabName == 'KYC') {

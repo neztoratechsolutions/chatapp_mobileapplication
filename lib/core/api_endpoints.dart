@@ -8,6 +8,7 @@ class ApiEndpoints {
   static const String verifyOtp = 'auth/verify-otp';
   static const String resetPassword = 'auth/reset-password';
   static const String logout = 'auth/logout';
+  static const String userStatus = 'user-status/';
 
   static String get statesUrl => '${BaseUrl.baseUrl}$states';
   static String get registerUrl => '${BaseUrl.baseUrl}$users';
@@ -16,4 +17,6 @@ class ApiEndpoints {
   static String get verifyOtpUrl => '${BaseUrl.baseUrl}$verifyOtp';
   static String get resetPasswordUrl => '${BaseUrl.baseUrl}$resetPassword';
   static String get logoutUrl => '${BaseUrl.baseUrl}$logout';
+  static String get userStatusUrl => '${BaseUrl.baseUrl}$userStatus';
+  static String userProfileUrl(dynamic id) => '${BaseUrl.baseUrl}$users$id';
 }

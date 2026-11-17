@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/api_endpoints.dart';
+import '../../../core/services/session_service.dart';
 
 class ProfileController extends GetxController {
   final name = 'Aarav User'.obs;
@@ -165,6 +166,7 @@ class ProfileController extends GetxController {
 
       await Future.delayed(const Duration(milliseconds: 400));
 
+      await SessionService.clearSession();
       // Navigate back to Login and clear routes
       Get.offAllNamed('/login');
     } catch (e) {
@@ -176,6 +178,7 @@ class ProfileController extends GetxController {
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
       );
+      await SessionService.clearSession();
       Get.offAllNamed('/login');
     } finally {
       isLoggingOut.value = false;

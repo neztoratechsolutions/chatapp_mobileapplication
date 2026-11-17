@@ -153,6 +153,8 @@ class InboxView extends GetView<InboxController> {
                     children: [
                       _buildTabItem('Dashboard', Icons.grid_view_rounded),
                       const SizedBox(width: 12),
+                      _buildTabItem('Inbox', Icons.chat_bubble_outline_rounded),
+                      const SizedBox(width: 12),
                       _buildTabItem('Profile Setup', Icons.person_outline_rounded),
                       const SizedBox(width: 12),
                       _buildTabItem('KYC', Icons.verified_user_outlined),
@@ -164,8 +166,6 @@ class InboxView extends GetView<InboxController> {
                       _buildTabItem('Earnings', Icons.bar_chart_rounded),
                       const SizedBox(width: 12),
                       _buildTabItem('Gifts', Icons.card_giftcard_rounded),
-                      const SizedBox(width: 12),
-                      _buildTabItem('Inbox', Icons.chat_bubble_outline_rounded),
                     ],
                   ),
                 ),

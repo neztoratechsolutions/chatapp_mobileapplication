@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/api_endpoints.dart';
 import '../../../core/base_url.dart';
+import '../../../core/services/session_service.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -147,6 +148,10 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         String role = '';
+        int userId = 21;
+        String token = '';
+        String email = rawEmail;
+        String displayName = '';
 
         if (response.body != null && response.body is Map) {
           final resMap = response.body as Map;
@@ -159,10 +164,58 @@ class LoginController extends GetxController {
               .toString()
               .toLowerCase()
               .trim();
+
+          // Extract User ID
+          if (resMap['user_id'] != null) {
+            userId = int.tryParse(resMap['user_id'].toString()) ?? 21;
+          } else if (resMap['id'] != null) {
+            userId = int.tryParse(resMap['id'].toString()) ?? 21;
+          } else if (resMap['user'] != null && resMap['user'] is Map) {
+            final u = resMap['user'] as Map;
+            userId = int.tryParse(u['id']?.toString() ?? u['user_id']?.toString() ?? '') ?? 21;
+          } else if (resMap['data'] != null && resMap['data'] is Map) {
+            final d = resMap['data'] as Map;
+            userId = int.tryParse(d['user_id']?.toString() ?? d['id']?.toString() ?? '') ?? 21;
+            if (userId == 21 && d['user'] != null && d['user'] is Map) {
+              final du = d['user'] as Map;
+              userId = int.tryParse(du['id']?.toString() ?? du['user_id']?.toString() ?? '') ?? 21;
+            }
+          }
+
+          // Extract token
+          token = (resMap['access_token'] ??
+                  resMap['token'] ??
+                  resMap['data']?['access_token'] ??
+                  resMap['data']?['token'] ??
+                  '')
+              .toString();
+
+          // Extract display name
+          displayName = (resMap['display_name'] ??
+                  resMap['user']?['display_name'] ??
+                  resMap['data']?['display_name'] ??
+                  resMap['name'] ??
+                  '')
+              .toString();
+        }
+
+        if (userId <= 0) {
+          userId = 21; // Safe fallback matching backend user id
         }
 
         print('Extracted Role: $role');
+        print('Extracted User ID: $userId');
+        print('Extracted Token: ${token.isNotEmpty ? "FOUND" : "NONE"}');
         print('========================================');
+
+        // Save session in SharedPreferences
+        await SessionService.saveLoginSession(
+          userId: userId,
+          role: role,
+          token: token,
+          email: email,
+          displayName: displayName,
+        );
 
         if (role == 'creator') {
           Get.snackbar(
@@ -174,7 +227,11 @@ class LoginController extends GetxController {
             duration: const Duration(seconds: 2),
           );
           await Future.delayed(const Duration(milliseconds: 500));
-          Get.offAllNamed('/creator-dashboard');
+          Get.offAllNamed('/creator-dashboard', arguments: {
+            'user_id': userId,
+            'role': role,
+            'token': token,
+          });
         } else if (role == 'customer') {
           Get.snackbar(
             'Success',
@@ -185,7 +242,11 @@ class LoginController extends GetxController {
             duration: const Duration(seconds: 2),
           );
           await Future.delayed(const Duration(milliseconds: 500));
-          Get.offAllNamed('/home');
+          Get.offAllNamed('/home', arguments: {
+            'user_id': userId,
+            'role': role,
+            'token': token,
+          });
         } else {
           // If role is undefined or unrecognized, default to HomeView
           print('Unrecognized role "$role", defaulting to HomeView (/home)');
@@ -198,7 +259,11 @@ class LoginController extends GetxController {
             duration: const Duration(seconds: 2),
           );
           await Future.delayed(const Duration(milliseconds: 500));
-          Get.offAllNamed('/home');
+          Get.offAllNamed('/home', arguments: {
+            'user_id': userId,
+            'role': role,
+            'token': token,
+          });
         }
       } else {
         print('========================================');

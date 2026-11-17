@@ -45,13 +45,31 @@ import 'features/creator_dashboard/gifts_received/gifts_received_binding.dart';
 import 'features/creator_dashboard/gifts_received/gifts_received_view.dart';
 import 'features/creator_dashboard/inbox/inbox_binding.dart';
 import 'features/creator_dashboard/inbox/inbox_view.dart';
+import 'core/services/session_service.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SessionService.init();
+
+  String initialRoute = '/login';
+  if (SessionService.cachedIsLoggedIn) {
+    if (SessionService.cachedRole == 'creator') {
+      initialRoute = '/creator-dashboard';
+    } else {
+      initialRoute = '/home';
+    }
+  }
+
+  print('========================================');
+  print('App starting with initialRoute: $initialRoute');
+  print('========================================');
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  const MyApp({super.key, this.initialRoute = '/login'});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +81,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8D32F0)),
         scaffoldBackgroundColor: const Color(0xFF0F0B21),
       ),
-      initialRoute: '/login',
+      initialRoute: initialRoute,
       getPages: [
         GetPage(
           name: '/login',
