@@ -1,7 +1,6 @@
-import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/base_url.dart';
 import 'profile_setup_controller.dart';
 
 class ProfileSetupView extends GetView<ProfileSetupController> {
@@ -122,7 +121,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                 ),
                 const SizedBox(height: 14),
 
-                // Email Address (API Data)
+                // Email Address
                 _buildReadOnlyCard(
                   label: 'Email Address',
                   value: controller.email.value.isNotEmpty ? controller.email.value : '—',
@@ -131,7 +130,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                 ),
                 const SizedBox(height: 14),
 
-                // Phone Number (API Data)
+                // Phone Number
                 _buildReadOnlyCard(
                   label: 'Phone Number',
                   value: controller.phone.value.isNotEmpty ? controller.phone.value : '—',
@@ -140,7 +139,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                 ),
                 const SizedBox(height: 14),
 
-                // Gender & State Row (API Data)
+                // Gender & State Row
                 Row(
                   children: [
                     Expanded(
@@ -153,11 +152,14 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildReadOnlyCard(
-                        label: 'State',
-                        value: controller.stateName.value.isNotEmpty ? controller.stateName.value : '—',
-                        icon: Icons.location_on_outlined,
-                        iconColor: const Color(0xFFFFB300),
+                      child: GestureDetector(
+                        onTap: () => _showStatePicker(context),
+                        child: _buildReadOnlyCard(
+                          label: 'State',
+                          value: controller.stateName.value.isNotEmpty ? controller.stateName.value : 'Select State',
+                          icon: Icons.location_on_outlined,
+                          iconColor: const Color(0xFFFFB300),
+                        ),
                       ),
                     ),
                   ],
@@ -237,61 +239,48 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
   }
 
   Widget _buildAvatarWidget() {
-    // 1. Newly picked local file
-    if (controller.selectedImage != null &&
-        controller.selectedImagePath.value.isNotEmpty &&
-        controller.selectedImage!.existsSync()) {
-      return Image.file(
-        controller.selectedImage!,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildAvatarInitial(),
-      );
-    }
-
-    // 2. Profile photo string from API
-    final photo = controller.profilePhoto.value.trim();
-    if (photo.isNotEmpty) {
-      // Base64 Data URI or raw base64 string
-      if (photo.startsWith('data:image') || (photo.length > 100 && !photo.startsWith('http://') && !photo.startsWith('https://'))) {
-        return _buildImageFromBase64(photo);
+    return Obx(() {
+      // 1. Newly picked local file
+      final localPath = controller.selectedImagePath.value;
+      if (localPath.isNotEmpty) {
+        final localFile = File(localPath);
+        if (localFile.existsSync()) {
+          return Image.file(
+            localFile,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildAvatarInitial(),
+          );
+        }
       }
 
-      // Network URL or server relative path
-      String photoUrl = photo.replaceAll(r'\', '/');
-      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
-        final cleanBase = BaseUrl.baseUrl.replaceAll(RegExp(r'/+$'), '');
-        final cleanPath = photoUrl.replaceAll(RegExp(r'^/+'), '');
-        photoUrl = '$cleanBase/$cleanPath';
+      // 2. Profile photo from API URL
+      final url = controller.fullPhotoUrl;
+      if (url.isNotEmpty) {
+        return Image.network(
+          url,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return const Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF58D6)),
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            print('[IMAGE_LOAD_ERROR] Failed loading image from: $url ($error)');
+            return _buildAvatarInitial();
+          },
+        );
       }
-      return Image.network(
-        photoUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildAvatarInitial(),
-      );
-    }
 
-    return _buildAvatarInitial();
-  }
-
-  Widget _buildImageFromBase64(String base64Str) {
-    try {
-      String cleanStr = base64Str.trim();
-      if (cleanStr.contains(',')) {
-        cleanStr = cleanStr.split(',').last.trim();
-      }
-      while (cleanStr.length % 4 != 0) {
-        cleanStr += '=';
-      }
-      final bytes = base64Decode(cleanStr);
-      return Image.memory(
-        bytes,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildAvatarInitial(),
-      );
-    } catch (e) {
-      print('Error decoding base64 image: $e');
       return _buildAvatarInitial();
-    }
+    });
   }
 
   Widget _buildAvatarInitial() {
@@ -405,6 +394,48 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
           onChanged: onChanged,
         ),
       ],
+    );
+  }
+
+  void _showStatePicker(BuildContext context) {
+    if (controller.statesList.isEmpty) return;
+
+    Get.bottomSheet(
+      Container(
+        height: 350,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: const BoxDecoration(
+          color: Color(0xFF17132F),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select State',
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: controller.statesList.length,
+                  itemBuilder: (context, index) {
+                    final state = controller.statesList[index];
+                    return ListTile(
+                      title: Text(state.name, style: const TextStyle(color: Colors.white)),
+                      onTap: () {
+                        controller.selectState(state);
+                        Get.back();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

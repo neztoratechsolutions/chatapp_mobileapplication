@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'creator_gallery_controller.dart';
 
 class CreatorGalleryView extends GetView<CreatorGalleryController> {
@@ -10,88 +11,159 @@ class CreatorGalleryView extends GetView<CreatorGalleryController> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0B21),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with Back Button
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Get.back(),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Gallery',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+        child: RefreshIndicator(
+          color: const Color(0xFFFF58D6),
+          backgroundColor: const Color(0xFF17132F),
+          onRefresh: controller.fetchGallery,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with Back Button
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Obx(() => Text(
-                'Upload up to 8 photos (${controller.images.length}/8 uploaded)',
-                style: const TextStyle(
-                  color: Colors.white60,
-                  fontSize: 15,
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Gallery',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              )),
-              const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-              // 5. Gallery Photo Grid
-              Obx(() {
-                final int totalItems = controller.images.length + (controller.images.length < 8 ? 1 : 0);
-                
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: totalItems,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.0,
+                // Upload count text
+                Obx(() => Text(
+                  'Upload up to 8 photos (${controller.galleryList.length}/8 uploaded)',
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 15,
                   ),
-                  itemBuilder: (context, index) {
-                    if (index == controller.images.length) {
-                      // Render "+" / Upload Button
-                      return _buildAddButtonCard(context);
-                    }
-                    
-                    final item = controller.images[index];
-                    return _buildImageCard(context, item);
-                  },
-                );
-              }),
-            ],
+                )),
+                const SizedBox(height: 24),
+
+                // Loading State or Grid View
+                Obx(() {
+                  if (controller.isLoading.value && controller.galleryList.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 80),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF58D6)),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final int totalItems = controller.galleryList.length + (controller.galleryList.length < 8 ? 1 : 0);
+
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: totalItems,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 1.0,
+                    ),
+                    itemBuilder: (context, index) {
+                      if (index == controller.galleryList.length) {
+                        // Render "+" / Upload Button
+                        return _buildAddButtonCard(context);
+                      }
+
+                      final item = controller.galleryList[index];
+                      return _buildImageCard(context, item);
+                    },
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-  Widget _buildImageCard(BuildContext context, GalleryItem item) {
+
+  Widget _buildImageCard(BuildContext context, GalleryModel item) {
     return GestureDetector(
       onTap: () => _showImageOptions(context, item),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: item.colors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: const Color(0xFF17132F),
           boxShadow: [
             BoxShadow(
-              color: item.colors.first.withOpacity(0.2),
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                item.fullPhotoUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: const Color(0xFF17132F),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF58D6)),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: const Color(0xFF17132F),
+                    child: const Center(
+                      child: Icon(Icons.broken_image_rounded, color: Colors.white38, size: 28),
+                    ),
+                  );
+                },
+              ),
+              // Deleting overlay spinner
+              Obx(() {
+                if (controller.deletingId.value == item.id) {
+                  return Container(
+                    color: Colors.black54,
+                    child: const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            ],
+          ),
         ),
       ),
     );
@@ -120,7 +192,7 @@ class CreatorGalleryView extends GetView<CreatorGalleryController> {
       }
 
       return GestureDetector(
-        onTap: controller.uploadImage,
+        onTap: () => _showImageSourcePicker(context),
         child: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF17132F),
@@ -139,7 +211,80 @@ class CreatorGalleryView extends GetView<CreatorGalleryController> {
     });
   }
 
-  void _showImageOptions(BuildContext context, GalleryItem item) {
+  void _showImageSourcePicker(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        decoration: const BoxDecoration(
+          color: Color(0xFF17132F),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Text(
+                'Upload Gallery Photo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF58D6).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.photo_library_rounded, color: Color(0xFFFF58D6)),
+                ),
+                title: const Text(
+                  'Choose from Gallery',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Get.back();
+                  controller.pickAndUploadImage(source: ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8D32F0).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.camera_alt_rounded, color: Color(0xFF8D32F0)),
+                ),
+                title: const Text(
+                  'Take Photo',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Get.back();
+                  controller.pickAndUploadImage(source: ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showImageOptions(BuildContext context, GalleryModel item) {
     Get.dialog(
       Dialog(
         backgroundColor: const Color(0xFF17132F),
@@ -149,15 +294,18 @@ class CreatorGalleryView extends GetView<CreatorGalleryController> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    colors: item.colors,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: SizedBox(
+                  width: 140,
+                  height: 140,
+                  child: Image.network(
+                    item.fullPhotoUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: const Color(0xFF0F0B21),
+                      child: const Icon(Icons.image_outlined, color: Colors.white38, size: 40),
+                    ),
                   ),
                 ),
               ),
@@ -199,8 +347,8 @@ class CreatorGalleryView extends GetView<CreatorGalleryController> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        controller.deleteImage(item.id);
                         Get.back();
+                        controller.deleteImage(item.id);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD32F2F),
